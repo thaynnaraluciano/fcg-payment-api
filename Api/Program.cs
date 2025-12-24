@@ -1,5 +1,7 @@
+using Api.Extensions;
 using Api.Utils;
 using CrossCutting.Exceptions.Middlewares;
+using CrossCutting.Monitoring;
 using Domain.Commands.v1.Pagamentos.BuscarPagamentoPorId;
 using Domain.Commands.v1.Pagamentos.BuscarPagamentoPorUsuario;
 using Domain.Commands.v1.Pagamentos.BuscarTodosPagamentos;
@@ -12,6 +14,8 @@ using Infrastructure.Data.Interfaces;
 using Infrastructure.Data.Repositories;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Prometheus;
+using Prometheus.DotNetRuntime;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -48,12 +52,20 @@ builder.Services.AddScoped<IValidator<BuscarPagamentoPorIdCommand>, BuscarPagame
 builder.Services.AddScoped<IPagamentoRepository, PagamentoRepository>();
 #endregion
 
-var connString = builder.Configuration.GetConnectionString("DefaultConnection");
+builder.Services.AddSingleton<IMetricsService, MetricsService>();
+
+// Le variáveis de ambiente (do SO, .env ou secrets)
+string host = Environment.GetEnvironmentVariable("DB_HOST") ?? "localhost";
+string db = Environment.GetEnvironmentVariable("DB_NAME") ?? "Bd_Payments";
+string user = Environment.GetEnvironmentVariable("DB_USER") ?? "root";
+string pass = Environment.GetEnvironmentVariable("DB_PASSWORD") ?? "root";
+
+string connString = $"Server={host};Database={db};User={user};Password={pass};";
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseMySql(
         connString,
-        new MySqlServerVersion(new Version(8, 0, 42))
+        new MySqlServerVersion(new Version(8, 0, 43))
     ));
 
 var app = builder.Build();
@@ -67,7 +79,12 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+DotNetRuntimeStatsBuilder.Default().StartCollecting();
+
 app.UseRouting();
+
+app.UseRequestMetrics();
+app.MapMetrics();
 
 app.UseAuthorization();
 
