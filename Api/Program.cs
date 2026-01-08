@@ -18,6 +18,7 @@ using Infrastructure.Data.Repositories;
 using Infrastructure.Services;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 using Prometheus;
 using Prometheus.DotNetRuntime;
 
@@ -51,7 +52,18 @@ builder.Services.AddHttpClient("GameApi", client =>
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "FIAP Cloud Games - Payment API",
+        Version = "v1",
+        Description = @"
+            FIAP Cloud Games é uma plataforma de venda de jogos digitais e gestão de servidores para partidas online.
+
+            - Pagamentos: Buscar pagamentos, cancelar pagamento, criar e confirmar pagamento."
+    });
+});
 
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 
@@ -99,7 +111,18 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 var app = builder.Build();
 
-app.UseSwagger();
+// Para rodar com API Gateway na AWS, usar caminho base /payment
+app.UseSwagger(c =>
+{
+    c.PreSerializeFilters.Add((swaggerDoc, httpReq) =>
+    {
+        swaggerDoc.Servers = new List<OpenApiServer>
+        {
+            new() { Url = "/payment" }
+        };
+    });
+});
+
 app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
