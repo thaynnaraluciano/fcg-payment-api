@@ -103,6 +103,7 @@ jobs:
             DB_PASSWORD=${{ secrets.DB_PASSWORD }}
             Services__GameApi=${{ secrets.GAMEAPI }}
             Services__UserApi=${{ secrets.USERAPI }}
+            PAYMENT_NOTIFICATION_LAMBDA=payment-notification
 
       - name: Deploy to ECS
         uses: aws-actions/amazon-ecs-deploy-task-definition@v2
