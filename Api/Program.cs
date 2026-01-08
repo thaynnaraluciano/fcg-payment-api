@@ -3,6 +3,7 @@ using Api.Extensions;
 using Api.Utils;
 using CrossCutting.Exceptions.Middlewares;
 using CrossCutting.Monitoring;
+using Domain;
 using Domain.Commands.v1.Pagamentos.BuscarPagamentoPorId;
 using Domain.Commands.v1.Pagamentos.BuscarPagamentoPorUsuario;
 using Domain.Commands.v1.Pagamentos.BuscarTodosPagamentos;
@@ -23,6 +24,29 @@ using Prometheus.DotNetRuntime;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+
+// 🔗 HTTP Client para UserAPI
+builder.Services.AddHttpClient("UserApi", client =>
+{
+    var baseUrl = builder.Configuration["Services:UserApi"];
+
+    if (string.IsNullOrWhiteSpace(baseUrl))
+        throw new Exception("Services:UserApi não configurado.");
+
+    client.BaseAddress = new Uri(baseUrl);
+});
+
+// 🎮 HTTP Client para GameAPI
+builder.Services.AddHttpClient("GameApi", client =>
+{
+    var baseUrl = builder.Configuration["Services:GameApi"];
+
+    if (string.IsNullOrWhiteSpace(baseUrl))
+        throw new Exception("Services:GameApi não configurado.");
+
+    client.BaseAddress = new Uri(baseUrl);
+});
+
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -57,6 +81,7 @@ builder.Services.AddScoped<IPagamentoNotificacaoService, PagamentoNotificacaoSer
 #endregion
 builder.Services.AddAWSService<IAmazonLambda>(); // usa credenciais do ambiente (ECS Task Role)
 builder.Services.AddSingleton<IMetricsService, MetricsService>();
+builder.Services.AddScoped<ValidacaoServicosExternos>();
 
 // Le variáveis de ambiente (do SO, .env ou secrets)
 string host = Environment.GetEnvironmentVariable("DB_HOST") ?? "localhost";
