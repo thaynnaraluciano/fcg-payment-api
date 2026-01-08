@@ -1,3 +1,4 @@
+using Amazon.Lambda;
 using Api.Extensions;
 using Api.Utils;
 using CrossCutting.Exceptions.Middlewares;
@@ -7,11 +8,13 @@ using Domain.Commands.v1.Pagamentos.BuscarPagamentoPorUsuario;
 using Domain.Commands.v1.Pagamentos.BuscarTodosPagamentos;
 using Domain.Commands.v1.Pagamentos.CancelarPagamento;
 using Domain.Commands.v1.Pagamentos.CriarPagamento;
+using Domain.Interfaces;
 using Domain.MapperProfiles;
 using FluentValidation;
 using Infrastructure.Data.Context;
 using Infrastructure.Data.Interfaces;
 using Infrastructure.Data.Repositories;
+using Infrastructure.Services;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Prometheus;
@@ -50,8 +53,9 @@ builder.Services.AddScoped<IValidator<BuscarPagamentoPorIdCommand>, BuscarPagame
 
 #region Interfaces
 builder.Services.AddScoped<IPagamentoRepository, PagamentoRepository>();
+builder.Services.AddScoped<IPagamentoNotificacaoService, PagamentoNotificacaoService>();
 #endregion
-
+builder.Services.AddAWSService<IAmazonLambda>(); // usa credenciais do ambiente (ECS Task Role)
 builder.Services.AddSingleton<IMetricsService, MetricsService>();
 
 // Le variáveis de ambiente (do SO, .env ou secrets)
