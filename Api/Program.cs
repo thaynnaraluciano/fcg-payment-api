@@ -8,6 +8,7 @@ using Domain.Commands.v1.Pagamentos.BuscarPagamentoPorId;
 using Domain.Commands.v1.Pagamentos.BuscarPagamentoPorUsuario;
 using Domain.Commands.v1.Pagamentos.BuscarTodosPagamentos;
 using Domain.Commands.v1.Pagamentos.CancelarPagamento;
+using Domain.Commands.v1.Pagamentos.ConfirmarPagamento;
 using Domain.Commands.v1.Pagamentos.CriarPagamento;
 using Domain.Interfaces;
 using Domain.MapperProfiles;
@@ -85,12 +86,14 @@ builder.Services.AddScoped<IValidator<CancelarPagamentoCommand>, CancelarPagamen
 builder.Services.AddScoped<IValidator<BuscarTodosPagamentosCommand>, BuscarTodosPagamentosCommandValidator>();
 builder.Services.AddScoped<IValidator<BuscarPagamentoPorUsuarioCommand>, BuscarPagamentoPorUsuarioCommandValidator>();
 builder.Services.AddScoped<IValidator<BuscarPagamentoPorIdCommand>, BuscarPagamentoPorIdCommandValidator>();
+builder.Services.AddScoped<IValidator<ConfirmarPagamentoCommand>, ConfirmarPagamentoCommandValidator>();
 #endregion
 
 #region Interfaces
 builder.Services.AddScoped<IPagamentoRepository, PagamentoRepository>();
 builder.Services.AddScoped<IPagamentoNotificacaoService, PagamentoNotificacaoService>();
 #endregion
+
 builder.Services.AddAWSService<IAmazonLambda>(); // usa credenciais do ambiente (ECS Task Role)
 builder.Services.AddSingleton<IMetricsService, MetricsService>();
 builder.Services.AddScoped<ValidacaoServicosExternos>();
