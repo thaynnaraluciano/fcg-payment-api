@@ -3,6 +3,7 @@ using Domain.Commands.v1.Pagamentos.BuscarPagamentoPorId;
 using Domain.Commands.v1.Pagamentos.BuscarPagamentoPorUsuario;
 using Domain.Commands.v1.Pagamentos.BuscarTodosPagamentos;
 using Domain.Commands.v1.Pagamentos.CancelarPagamento;
+using Domain.Commands.v1.Pagamentos.ConfirmarPagamento;
 using Domain.Commands.v1.Pagamentos.CriarPagamento;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -64,5 +65,14 @@ namespace Api.Controllers
 
             return Ok(response);
         }
+
+        // PATCH api/v1/pagamento/{id}/pagar
+        [HttpPatch("{id:guid}/pagar")]
+        public async Task<IActionResult> ConfirmarPagamento(Guid id)
+        {
+            var response = await _mediator.Send(new ConfirmarPagamentoCommand { Id = id });
+            return Ok(response);
+        }
+
     }
 }

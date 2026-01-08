@@ -8,6 +8,8 @@
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="13.0.1" />
+    <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="4.0.3.19" />
+    <PackageReference Include="AWSSDK.Lambda" Version="4.0.12.3" />
     <PackageReference Include="MediatR" Version="13.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.10" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.10" />
@@ -21,6 +23,7 @@
     <ProjectReference Include="..\CrossCutting\CrossCutting.Exceptions\CrossCutting.Exceptions.csproj" />
     <ProjectReference Include="..\CrossCutting\CrossCutting.Monitoring\CrossCutting.Monitoring.csproj" />
     <ProjectReference Include="..\Domain\Domain.csproj" />
+    <ProjectReference Include="..\Infrastructure\Infrastructure.Services\Infrastructure.Services.csproj" />
   </ItemGroup>
 
 </Project>
