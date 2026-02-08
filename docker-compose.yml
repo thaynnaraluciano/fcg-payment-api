@@ -29,9 +29,29 @@ services:
       - mysql_data:/var/lib/mysql
     networks:
       - fiap-net
+  
+  rabbitmq:
+    image: rabbitmq:3.11-management
+    container_name: fiap-rabbitmq
+    restart: unless-stopped
+    hostname: rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: root
+      RABBITMQ_DEFAULT_PASS: root
+      RABBITMQ_DEFAULT_VHOST: /
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - fiap-net
 
 networks:
   fiap-net:
+    driver: bridge
 
 volumes:
   mysql_data:
+  rabbitmq_data:
+    driver: local
