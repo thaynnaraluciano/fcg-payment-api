@@ -16,7 +16,10 @@ using FluentValidation;
 using Infrastructure.Data.Context;
 using Infrastructure.Data.Interfaces;
 using Infrastructure.Data.Repositories;
+using Infrastructure.Messaging.Interfaces;
+using Infrastructure.Messaging.Publishers;
 using Infrastructure.Services;
+using MassTransit;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
@@ -27,6 +30,8 @@ using System.Text.Json.Serialization;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+
+#region HTTP 
 
 // 🔗 HTTP Client para UserAPI
 builder.Services.AddHttpClient("UserApi", client =>
@@ -50,6 +55,25 @@ builder.Services.AddHttpClient("GameApi", client =>
     client.BaseAddress = new Uri(baseUrl);
 });
 
+#endregion
+
+#region RABBIT MQ
+
+builder.Services.AddMassTransit(x =>
+{
+    x.UsingRabbitMq((context, cfg) =>
+    {
+        cfg.Host("localhost", "/", h =>
+        {
+            h.Username("root");
+            h.Password("root");
+        });
+
+        cfg.ConfigureEndpoints(context);
+    });
+});
+
+#endregion
 
 builder.Services.AddControllers().AddJsonOptions(options =>
     {
@@ -101,6 +125,8 @@ builder.Services.AddScoped<IValidator<ConfirmarPagamentoCommand>, ConfirmarPagam
 #region Interfaces
 builder.Services.AddScoped<IPagamentoRepository, PagamentoRepository>();
 builder.Services.AddScoped<IPagamentoNotificacaoService, PagamentoNotificacaoService>();
+builder.Services.AddScoped<IPaymentConfirmedEventPublisher, PaymentConfirmedEventPublisher>();
+
 #endregion
 
 builder.Services.AddAWSService<IAmazonLambda>(); // usa credenciais do ambiente (ECS Task Role)
