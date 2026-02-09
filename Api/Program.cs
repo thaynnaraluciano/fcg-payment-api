@@ -16,6 +16,7 @@ using FluentValidation;
 using Infrastructure.Data.Context;
 using Infrastructure.Data.Interfaces;
 using Infrastructure.Data.Repositories;
+using Infrastructure.Messaging.Configurations;
 using Infrastructure.Messaging.Interfaces;
 using Infrastructure.Messaging.Publishers;
 using Infrastructure.Services;
@@ -63,13 +64,7 @@ builder.Services.AddMassTransit(x =>
 {
     x.UsingRabbitMq((context, cfg) =>
     {
-        cfg.Host("localhost", "/", h =>
-        {
-            h.Username("root");
-            h.Password("root");
-        });
-
-        cfg.ConfigureEndpoints(context);
+        MassTransitConfiguration.Configure(context, cfg);
     });
 });
 
