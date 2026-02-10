@@ -1,4 +1,5 @@
-﻿using MassTransit;
+﻿using CrossCutting.Messaging.Events;
+using MassTransit;
 
 namespace Infrastructure.Messaging.Configurations
 {
@@ -6,18 +7,17 @@ namespace Infrastructure.Messaging.Configurations
     {
         public static void Configure(IBusRegistrationContext context, IRabbitMqBusFactoryConfigurator cfg)
         {
-            cfg.Host("localhost", "/", h =>
+            cfg.Host("127.0.0.1", "/", h =>
             {
                 h.Username("root");
                 h.Password("root");
             });
 
-            cfg.UseMessageRetry(r =>
+            // Exchange
+            cfg.Message<PaymentConfirmedEvent>(x =>
             {
-                r.Interval(3, TimeSpan.FromSeconds(5));
+                x.SetEntityName("payment-confirmed");
             });
-
-            cfg.ConfigureEndpoints(context);
         }
     }
 }
