@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
 using CrossCutting.Exceptions;
+using CrossCutting.Messaging.Events;
 using Domain.Enums;
 using Domain.Interfaces;
 using Infrastructure.Data.Interfaces;
+using Infrastructure.Messaging.Interfaces;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
@@ -14,17 +16,20 @@ public class ConfirmarPagamentoCommandHandler : IRequestHandler<ConfirmarPagamen
     private readonly IPagamentoNotificacaoService _notificacaoService;
     private readonly IMapper _mapper;
     private readonly ILogger<ConfirmarPagamentoCommandHandler> _logger;
+    private readonly IPaymentConfirmedEventPublisher _paymentConfirmedPublisher;
 
     public ConfirmarPagamentoCommandHandler(
         IPagamentoRepository pagamentoRepository,
         IPagamentoNotificacaoService notificacaoService,
         IMapper mapper,
-        ILogger<ConfirmarPagamentoCommandHandler> logger)
+        ILogger<ConfirmarPagamentoCommandHandler> logger,
+        IPaymentConfirmedEventPublisher paymentConfirmedPublisher)
     {
         _pagamentoRepository = pagamentoRepository;
         _notificacaoService = notificacaoService;
         _mapper = mapper;
         _logger = logger;
+        _paymentConfirmedPublisher = paymentConfirmedPublisher;
     }
 
     public async Task<ConfirmarPagamentoCommandResponse> Handle(ConfirmarPagamentoCommand request, CancellationToken cancellationToken)
@@ -51,6 +56,9 @@ public class ConfirmarPagamentoCommandHandler : IRequestHandler<ConfirmarPagamen
         await _pagamentoRepository.AtualizarPagamentoAsync(pagamento);
 
         _logger.LogInformation("Pagamento {PagamentoId} confirmado com sucesso", request.Id);
+
+        // Notifica a api de jogos que o pagamento foi confirmado
+        await _paymentConfirmedPublisher.PublishPaymentConfirmed(new PaymentConfirmedEvent(pagamento.Id, pagamento.UserId, pagamento.GameId, pagamento.Valor, DateTime.UtcNow));
 
         // Dispara notificação APÓS salvar o status pago
         await _notificacaoService.NotificarAsync(
