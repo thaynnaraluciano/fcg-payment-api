@@ -10,9 +10,8 @@
     <PackageReference Include="AutoMapper" Version="13.0.1" />
     <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="4.0.3.19" />
     <PackageReference Include="AWSSDK.Lambda" Version="4.0.12.3" />
-    <PackageReference Include="MassTransit" Version="9.0.1" />
-    <PackageReference Include="MassTransit.RabbitMQ" Version="9.0.1" />
-    <PackageReference Include="MassTransit.AspNetCore" Version="7.3.1" />
+    <PackageReference Include="MassTransit" Version="8.2.5" />
+    <PackageReference Include="MassTransit.RabbitMQ" Version="8.2.5" />
     <PackageReference Include="MediatR" Version="13.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.10" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.10" />
