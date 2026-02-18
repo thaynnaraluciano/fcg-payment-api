@@ -7,11 +7,9 @@ namespace Infrastructure.Messaging.Configurations
     {
         public static void Configure(IBusRegistrationContext context, IRabbitMqBusFactoryConfigurator cfg)
         {
-            cfg.Host("127.0.0.1", "/", h =>
-            {
-                h.Username("root");
-                h.Password("root");
-            });
+            var rabbitUrl = Environment.GetEnvironmentVariable("RABBITMQ_URL") ?? "rabbitmq://127.0.0.1/";
+
+            cfg.Host(new Uri(rabbitUrl));
 
             // Exchange
             cfg.Message<PaymentConfirmedEvent>(x =>
