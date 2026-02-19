@@ -60,14 +60,6 @@ public class ConfirmarPagamentoCommandHandler : IRequestHandler<ConfirmarPagamen
         // Notifica a api de jogos que o pagamento foi confirmado
         await _paymentConfirmedPublisher.PublishPaymentConfirmed(new PaymentConfirmedEvent(pagamento.Id, pagamento.UserId, pagamento.GameId, pagamento.Valor, DateTime.UtcNow));
 
-        // Dispara notificação APÓS salvar o status pago
-        await _notificacaoService.NotificarAsync(
-            pagamento.Id,
-            pagamento.UserId,
-            pagamento.Valor,
-            (StatusPagamento)pagamento.Status
-        );
-
         return _mapper.Map<ConfirmarPagamentoCommandResponse>(pagamento);
     }
 }
