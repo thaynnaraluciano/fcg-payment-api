@@ -6,6 +6,7 @@
         Aprovado = 1,
         Rejeitado = 2,
         Cancelado = 3,
-        Reembolsado = 4
+        Reembolsado = 4,
+        Processando = 5
     }
 }

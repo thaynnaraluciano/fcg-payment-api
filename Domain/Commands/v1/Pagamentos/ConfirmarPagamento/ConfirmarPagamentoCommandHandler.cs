@@ -51,11 +51,11 @@ public class ConfirmarPagamentoCommandHandler : IRequestHandler<ConfirmarPagamen
             throw new BusinessException("Somente pagamentos pendentes podem ser confirmados.");
         }
 
-        pagamento.Status = (int)StatusPagamento.Aprovado;
+        pagamento.Status = (int)StatusPagamento.Processando;
 
         await _pagamentoRepository.AtualizarPagamentoAsync(pagamento);
 
-        _logger.LogInformation("Pagamento {PagamentoId} confirmado com sucesso", request.Id);
+        _logger.LogInformation("Pagamento {PagamentoId} publicado na fila.", request.Id);
 
         // Notifica a api de jogos que o pagamento foi confirmado
         await _paymentConfirmedPublisher.PublishPaymentConfirmed(new PaymentConfirmedEvent(pagamento.Id, pagamento.UserId, pagamento.GameId, pagamento.Valor, DateTime.UtcNow));
